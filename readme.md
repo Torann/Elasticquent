@@ -71,25 +71,18 @@ When using a database, Eloquent models are populated from data read from a datab
 
 Before you start using Elasticquent, make sure you've installed [Elasticsearch](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/_installation.html).
 
-To get started, add Elasticquent to you composer.json file:
+From the command line run:
 
-    "elasticquent/elasticquent": "dev-master"
+```
+$ composer require torann/elasticquent
+```
 
-Once you've run a `composer update`, you need to register Laravel service provider, in your `config/app.php`:
+Once installed you need to register the service provider with the application. Open up `config/app.php` and find the `providers` key.
 
 ```php
 'providers' => [
     ...
     Elasticquent\ElasticquentServiceProvider::class,
-],
-```
-
-We also provide a facade for elasticsearch-php client (which has connected using our settings), add following to your `config/app.php` if you need so.
-
-```php
-'aliases' => [
-    ...
-    'Es' => Elasticquent\ElasticquentElasticsearchFacade::class,
 ],
 ```
 
@@ -117,7 +110,7 @@ $ php artisan vendor:publish --provider="Elasticquent\ElasticquentServiceProvide
 ```php
 <?php
 
-return array(
+return [
 
     /*
     |--------------------------------------------------------------------------
@@ -146,7 +139,39 @@ return array(
 
     'default_index' => 'my_custom_index_name',
 
-);
+    /*
+    |--------------------------------------------------------------------------
+    | Default Index Settings
+    |--------------------------------------------------------------------------
+    |
+    | This is the settings used when creating an Elasticsearch index.
+    |
+    | 'default_settings' => [
+    |     'number_of_shards' => 1,
+    |     'analysis' => [
+    |         'filter' => [
+    |             'autocomplete_filter' => [
+    |                 'type' => 'edge_ngram',
+    |                 'min_gram' => 1,
+    |                 'max_gram' => 20,
+    |             ],
+    |         ],
+    |         'analyzer' => [
+    |             'autocomplete' => [
+    |                 'type' => 'custom',
+    |                 'tokenizer' => 'standard',
+    |                 'filter' => [
+    |                     'lowercase',
+    |                     'autocomplete_filter',
+    |                 ],
+    |             ],
+    |         ],
+    |     ],
+    | ],
+    */
+
+    'default_settings' => null,
+];
 
 ```
 
@@ -154,68 +179,50 @@ return array(
 
 While you can definitely build your indexes and mapping through the Elasticsearch API, you can also use some helper methods to build indexes and types right from your models.
 
-If you want a simple way to create indexes, Elasticquent models have a function for that:
+If you want a simple way to create indexes, Elasticquent ships with a simple Artisan command:
 
-    Book::createIndex($shards = null, $replicas = null);
+```
+php artisan es:install
+```
 
-For custom analyzer, you can set an `indexSettings` property in your model and define the analyzers from there:
+For custom analyzer, you can set an `default_settings` property in the `config/elasticquent.php` file:
 
 ```php
-    /**
-     * The elasticsearch settings.
-     *
-     * @var array
-     */
-    protected $indexSettings = [
-        'analysis' => [
-            'char_filter' => [
-                'replace' => [
-                    'type' => 'mapping',
-                    'mappings' => [
-                        '&=> and '
-                    ],
-                ],
-            ],
-            'filter' => [
-                'word_delimiter' => [
-                    'type' => 'word_delimiter',
-                    'split_on_numerics' => false,
-                    'split_on_case_change' => true,
-                    'generate_word_parts' => true,
-                    'generate_number_parts' => true,
-                    'catenate_all' => true,
-                    'preserve_original' => true,
-                    'catenate_numbers' => true,
-                ]
-            ],
-            'analyzer' => [
-                'default' => [
-                    'type' => 'custom',
-                    'char_filter' => [
-                        'html_strip',
-                        'replace',
-                    ],
-                    'tokenizer' => 'whitespace',
-                    'filter' => [
-                        'lowercase',
-                        'word_delimiter',
-                    ],
-                ],
-            ],
-        ],
-    ];
-
+[
+    'default_settings' => [
+         'number_of_shards' => 1,
+         'analysis' => [
+             'filter' => [
+                 'autocomplete_filter' => [
+                     'type' => 'edge_ngram',
+                     'min_gram' => 1,
+                     'max_gram' => 20,
+                 ],
+             ],
+             'analyzer' => [
+                 'autocomplete' => [
+                     'type' => 'custom',
+                     'tokenizer' => 'standard',
+                     'filter' => [
+                         'lowercase',
+                         'autocomplete_filter',
+                     ],
+                 ],
+             ],
+         ],
+     ],
+]
 ```
 
 For mapping, you can set a `mappingProperties` property in your model and use some mapping functions from there:
 
 ```php
-protected $mappingProperties = array(
-   'title' => array(
+protected $mappingProperties = [
+   'title' => [
         'type' => 'string',
         'analyzer' => 'standard'
-    )
-);
+    ]
+];
 ```
 
 If you'd like to setup a model's type mapping based on your mapping properties, you can use:
@@ -248,7 +255,7 @@ You can also get the type mapping and check if it exists.
 By default, Elasticquent will look for the `default_index` key within your configuration file(`config/elasticquent.php`). To set the default value for an index being used, you can edit this file and set the `default_index` key:
 
 ```php
-return array(
+return [
 
    // Other configuration keys ...
    
@@ -262,7 +269,7 @@ return array(
     */
     
    'default_index' => 'my_custom_index_name',
-);
+];
 ```
 
 If you'd like to have a more dynamic index, you can also override the default configuration with a `getIndexName` method inside your Eloquent model:
@@ -344,7 +351,9 @@ The second is a query based search for more complex searching needs:
 **Example:**
 
 ```php
-    $books = Book::searchByQuery(array('match' => array('title' => 'Moby Dick')));
+    $books = Book::searchByQuery([
+        'match' => ['title' => 'Moby Dick']
+    ]);
 ```
 Here's the list of available parameters:
 
@@ -361,20 +370,20 @@ The final method is a raw query that will be sent to Elasticsearch. This method 
 when searching for records inside Elasticsearch:
 
 ```php
-    $books = Book::complexSearch(array(
-        'body' => array(
-            'query' => array(
-                'match' => array(
+    $books = Book::complexSearch([
+        'body' => [
+            'query' => [
+                'match' => [
                     'title' => 'Moby Dick'
-                )
-            )
-        )
-    ));
+                ]
+            ]
+        ]
+    ]);
 ```
 
 This is the equivalent to:
 ```php
-    $books = Book::searchByQuery(array('match' => array('title' => 'Moby Dick')));
+    $books = Book::searchByQuery(['match' => ['title' => 'Moby Dick']]);
 ```
 
 ### Search Collections
@@ -436,7 +445,7 @@ You can check the document score that Elasticsearch assigned to this document wi
 Similar to `Illuminate\Support\Collection`, the `chunk` method breaks the Elasticquent collection into multiple, smaller collections of a given size:
 
 ```php
-    $all_books = Book::searchByQuery(array('match' => array('title' => 'Moby Dick')));
+    $all_books = Book::searchByQuery(['match' => ['title' => 'Moby Dick']]);
     $books = $all_books->chunk(10);
 ```
 
@@ -448,10 +457,10 @@ If you're dealing with raw search data from outside of Elasticquent, you can use
 ```php
 $client = new \Elasticsearch\Client();
 
-$params = array(
+$params = [
     'index' => 'default',
     'type'  => 'books'
-);
+];
 
 $params['body']['query']['match']['title'] = 'Moby Dick';
 
@@ -472,11 +481,11 @@ By default, Elasticquent will use the entire attribute array for your Elasticsea
 ```php
 function getIndexDocumentData()
 {
-    return array(
+    return [
         'id'      => $this->id,
         'title'   => $this->title,
         'custom'  => 'variable'
-    );
+    ];
 }
 ```
 Be careful with this, as Elasticquent reads the document source into the Eloquent model attributes when creating a search result collection, so make sure you are indexing enough data for your the model functionality you want to use.
@@ -497,4 +506,3 @@ class MyCollection extends \Illuminate\Database\Eloquent\Collection
 Elasticquent currently needs:
 
 * Tests that mock ES API calls.
-* Support for routes
