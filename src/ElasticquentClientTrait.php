@@ -2,10 +2,10 @@
 
 namespace Elasticquent;
 
+use Elasticsearch\Client;
+
 trait ElasticquentClientTrait
 {
-    use ElasticquentConfigTrait;
-
     /**
      * Get ElasticSearch Client
      *
@@ -13,15 +13,16 @@ trait ElasticquentClientTrait
      */
     public function getElasticSearchClient()
     {
-        $config = $this->getElasticConfig();
-
-        // elasticsearch v2.0 using builder
-        if (class_exists('\Elasticsearch\ClientBuilder')) {
-            return \Elasticsearch\ClientBuilder::fromConfig($config);
-        }
-
-        // elasticsearch v1
-        return new \Elasticsearch\Client($config);
+        return app(Client::class);
     }
 
+    /**
+     * Get Index Name
+     *
+     * @return string
+     */
+    public function getIndexName()
+    {
+        return config('elasticquent.default_index', 'default');
+    }
 }

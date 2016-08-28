@@ -5,7 +5,7 @@ interface ElasticquentInterface
     /**
      * Get ElasticSearch Client
      *
-     * @return Elasticsearch\Client
+     * @return \Elasticsearch\Client
      */
     public function getElasticSearchClient();
 
@@ -13,9 +13,10 @@ interface ElasticquentInterface
      * New Collection
      *
      * @param array $models
-     * @return Collection
+     *
+     * @return ElasticquentCollection
      */
-    public function newCollection(array $models = array());
+    public function newCollection(array $models = []);
 
     /**
      * Get Index Name
@@ -72,7 +73,7 @@ interface ElasticquentInterface
     /**
      * Search a Type.
      */
-    public static function search($query = array());
+    public static function search($query = []);
 
     /**
      * Add to Search Index

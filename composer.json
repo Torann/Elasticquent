@@ -1,5 +1,5 @@
 {
-  "name": "elasticquent/elasticquent",
+  "name": "torann/elasticquent",
   "type": "library",
   "description": "Maps Laravel Eloquent models to Elasticsearch types.",
   "keywords": [
@@ -7,9 +7,14 @@
     "eloquent",
     "laravel"
   ],
-  "homepage": "https://github.com/elasticquent/Elasticquent",
+  "homepage": "https://github.com/Torann/Elasticquent",
   "license": "MIT",
   "authors": [
+    {
+      "name": "Daniel Stainback",
+      "email": "daniel@lyften.com",
+      "homepage": "http://lyften.com"
+    },
     {
       "name": "Adam Fairholm",
       "email": "adam.fairholm@gmail.com",
@@ -17,11 +22,11 @@
     }
   ],
   "require": {
-    "php": ">=5.4.0",
-    "illuminate/database": "~4.2|^5",
-    "illuminate/config": "~4.2|^5",
-    "nesbot/carbon": "~1.0",
-    "elasticsearch/elasticsearch": ">1.0 <2.2"
+    "php": ">=5.5.0",
+    "illuminate/support": "5.2 - 5.3",
+    "illuminate/database": "5.2 - 5.3",
+    "illuminate/config": "5.2 - 5.3",
+    "elasticsearch/elasticsearch": ">2.0 <2.2"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.2|~5.0",

@@ -1,4 +1,6 @@
-<?php namespace Elasticquent;
+<?php
+
+namespace Elasticquent;
 
 /**
  * Elasticquent Collection Trait
@@ -23,16 +25,16 @@ trait ElasticquentCollectionTrait
             return null;
         }
 
-        $params = array();
+        $params = [];
 
         foreach ($this->all() as $item) {
-            $params['body'][] = array(
-                'index' => array(
+            $params['body'][] = [
+                'index' => [
                     '_id' => $item->getKey(),
                     '_type' => $item->getTypeName(),
                     '_index' => $item->getIndexName(),
-                ),
-            );
+                ],
+            ];
 
             $params['body'][] = $item->getIndexDocumentData();
         }
@@ -49,16 +51,16 @@ trait ElasticquentCollectionTrait
     {
         $all = $this->all();
 
-        $params = array();
+        $params = [];
 
         foreach ($all as $item) {
-            $params['body'][] = array(
-                'delete' => array(
+            $params['body'][] = [
+                'delete' => [
                     '_id' => $item->getKey(),
                     '_type' => $item->getTypeName(),
                     '_index' => $item->getIndexName(),
-                ),
-            );
+                ],
+            ];
         }
 
         return $this->getElasticSearchClient()->bulk($params);
@@ -74,7 +76,7 @@ trait ElasticquentCollectionTrait
     public function reindex()
     {
         $this->deleteFromIndex();
+
         return $this->addToIndex();
     }
-
 }
