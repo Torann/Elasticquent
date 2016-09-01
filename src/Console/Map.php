@@ -10,7 +10,7 @@ class Map extends AbstractCommand
      * @var string
      */
     protected $signature = 'es:map
-                                {action : Mapping action to perform (update or delete)}
+                                {action : Mapping action to perform (add or remove)}
                                 {model : Name or comma separated names of the model(s) to initialize}';
 
     /**
@@ -27,7 +27,7 @@ class Map extends AbstractCommand
      */
     public function handle()
     {
-        $action = $this->getActionArgument(['update', 'delete']);
+        $action = $this->getActionArgument(['add', 'remove']);
 
         // Perform actions on models
         foreach ($this->getModelArgument() as $model) {
@@ -42,29 +42,29 @@ class Map extends AbstractCommand
     }
 
     /**
-     * Update ElasticSearch model mapping.
+     * Add ElasticSearch model mapping.
      *
      * @param  string $model
      *
      * @return bool
      */
-    protected function update($model)
+    protected function add($model)
     {
-        $this->output->write("Updating {$model} mapping...");
+        $this->output->write("Adding {$model} mapping...");
 
         return $this->makeCall($model, 'putMapping');
     }
 
     /**
-     * Delete ElasticSearch model mapping.
+     * Remove ElasticSearch model mapping.
      *
      * @param  string $model
      *
      * @return bool
      */
-    protected function delete($model)
+    protected function remove($model)
     {
-        $this->output->write("Deleting {$model} mapping...");
+        $this->output->write("Removing {$model} mapping...");
 
         return $this->makeCall($model, 'deleteMapping');
     }
