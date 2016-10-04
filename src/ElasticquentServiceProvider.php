@@ -18,7 +18,7 @@ class ElasticquentServiceProvider extends ServiceProvider
         if ($this->isLumen() === false) {
             $this->publishes([
                 __DIR__.'/../config/elasticquent.php' => config_path('elasticquent.php'),
-            ]);
+            ], 'config');
 
             $this->mergeConfigFrom(
                 __DIR__.'/../config/elasticquent.php', 'elasticquent'
