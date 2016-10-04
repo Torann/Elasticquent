@@ -374,6 +374,11 @@ trait ElasticquentTrait
      */
     public function updateIndex()
     {
+        // Update or index
+        if ($this->isDocumentIndexed() === false) {
+            return $this->addToIndex();
+        }
+
         $params = $this->getBasicEsParams();
 
         // Get our document body data.
@@ -393,6 +398,16 @@ trait ElasticquentTrait
     public function getIndexedDocument()
     {
         return $this->getElasticSearchClient()->get($this->getBasicEsParams());
+    }
+
+    /**
+     * Determine if the Document is indexed.
+     *
+     * @return bool
+     */
+    public function isDocumentIndexed()
+    {
+        return $this->getElasticSearchClient()->exists($this->getBasicEsParams());
     }
 
     /**
