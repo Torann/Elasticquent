@@ -1,6 +1,11 @@
 # Elasticquent
 
-_Elasticsearch for Eloquent Laravel Models_
+[![Patreon donate button](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/torann)
+[![Donate weekly to this project using Gratipay](https://img.shields.io/badge/gratipay-donate-yellow.svg)](https://gratipay.com/~torann)
+[![Donate to this project using Flattr](https://img.shields.io/badge/flattr-donate-yellow.svg)](https://flattr.com/profile/torann)
+[![Donate to this project using Paypal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4CJA2A97NPYVU)
+
+Elasticsearch for Eloquent Laravel Models
 
 Elasticquent makes working with [Elasticsearch](http://www.elasticsearch.org/) and [Eloquent](http://laravel.com/docs/eloquent) models easier by mapping them to Elasticsearch types. You can use the default settings or define how Elasticsearch should index and search your Eloquent models right in the model.
 
@@ -20,6 +25,7 @@ You must be running _at least_ Elasticsearch 1.0. Elasticsearch 0.9 and below *w
     * [Setting a Custom Index Name](#setting-a-custom-index-name)
     * [Setting a Custom Type Name](#setting-a-custom-type-name)
 * [Indexing Documents](#indexing-documents)
+* [Artisan Commands](#artisan-commands)
 * [Searching](#searching)
     * [Search Collections](#search-collections)
     * [Search Collection Documents](#search-collection-documents)
@@ -179,12 +185,6 @@ return [
 
 While you can definitely build your indexes and mapping through the Elasticsearch API, you can also use some helper methods to build indexes and types right from your models.
 
-If you want a simple way to create indexes, Elasticquent ships with a simple Artisan command:
-
-```
-php artisan es:install
-```
-
 For custom analyzer, you can set an `default_settings` property in the `config/elasticquent.php` file:
 
 ```php
@@ -326,6 +326,37 @@ You can also reindex an entire model:
 
 ```php
     Book::reindex();
+```
+
+## Artisan Commands
+
+#### `es:install`
+
+Create the Elasticsearch index.
+
+#### `es:uninstall`
+
+Remove the Elasticsearch index.
+
+#### `es:map <action> <model>`
+
+Initialize an Eloquent model.
+
+Arguments:
+
+```
+ action              Mapping action to perform (add or remove)
+ model               Name or comma separated names of the model(s) to initialize
+```
+
+#### `es:index [options] [--] <model>`
+
+Index or reindex all the entries in an Eloquent model.
+
+Arguments:
+
+```
+ model               Name or comma separated names of the model(s) to index
 ```
 
 ## Searching
